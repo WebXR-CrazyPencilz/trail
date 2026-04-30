@@ -3,49 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 Image Viewer</title>
+    <title>360 Viewer</title>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; overflow: hidden; background: #000; }
         canvas { display: block; }
+
+        #loader {
+            position: absolute; inset: 0;
+            background: #000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: white; font-family: sans-serif;
+            z-index: 10;
+        }
+        #loader-bar-bg {
+            width: 220px; height: 4px;
+            background: #333; border-radius: 2px; margin-top: 16px;
+        }
+        #loader-bar {
+            height: 100%; width: 0%;
+            background: white; border-radius: 2px;
+            transition: width 0.2s;
+        }
+        #loader-text { font-size: 13px; margin-top: 10px; opacity: 0.6; }
+
+        #info {
+            position: absolute; bottom: 24px; left: 50%;
+            transform: translateX(-50%);
+            color: white; font-family: sans-serif; font-size: 13px;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(6px);
+            padding: 8px 18px; border-radius: 20px;
+            pointer-events: none; opacity: 1;
+            transition: opacity 1s;
+        }
+
+        #zoom {
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        #zoom button {
+            width: 38px; height: 38px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+            border: none; border-radius: 50%;
+            color: white; font-size: 20px;
+            cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+        }
+        #zoom button:hover { background: rgba(255,255,255,0.3); }
     </style>
 </head>
 <body>
+
+    <div id="loader">
+        <div style="font-size:15px;letter-spacing:2px;opacity:0.8">LOADING</div>
+        <div id="loader-bar-bg"><div id="loader-bar"></div></div>
+        <div id="loader-text">0%</div>
+    </div>
+
+    <div id="info">🖱 Drag to look around &nbsp;|&nbsp; Scroll to zoom</div>
+
+    <div id="zoom">
+        <button id="zoomIn" title="Zoom In">+</button>
+        <button id="zoomOut" title="Zoom Out">−</button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // Set up the scene, camera, and renderer
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        // ─── SCENE SETUP ───────────────────────────────────────────
+        const scene    = new THREE.Scene();
+        const camera   = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(devicePixelRatio);
+        renderer.setSize(innerWidth, innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Load the 360-degree image as a texture
+        // ─── LOAD TEXTURE ──────────────────────────────────────────
+        const loader  = document.getElementById('loader');
+        const bar     = document.getElementById('loader-bar');
+        const barText = document.getElementById('loader-text');
+
         const textureLoader = new THREE.TextureLoader();
-        const texture = textureLoader.load('https://momento360.com/e/u/80090d2af4ca428088e42ce80f6272a9?utm_campaign=embed&utm_source=other&heading=-289.94&pitch=7.8&field-of-view=75&size=medium&display-plan=true', () => {
-            // Create a sphere geometry to wrap the texture around
-            const geometry = new THREE.SphereGeometry(500, 60, 40);
-            geometry.scale(-1, 1, 1); // Flip the geometry inside-out
+        textureLoader.load(
+            'https://ik.imagekit.io/pwzaetheh/New%20Folder/Master_Bedroom_toilet.jpg', // 🔁 Replace with your ImageKit URL
+            (texture) => {
+                // Success
+                const geo  = new THREE.SphereGeometry(500, 60, 40);
+                geo.scale(-1, 1, 1);
+                const mat  = new THREE.MeshBasicMaterial({ map: texture });
+                scene.add(new THREE.Mesh(geo, mat));
+                loader.style.display = 'none';
 
-            const material = new THREE.MeshBasicMaterial({ map: texture });
-            const sphere = new THREE.Mesh(geometry, material);
+                // Hide hint after 4 seconds
+                setTimeout(() => {
+                    document.getElementById('info').style.opacity = '0';
+                }, 4000);
+            },
+            (xhr) => {
+                // Progress
+                if (xhr.total) {
+                    const pct = Math.round((xhr.loaded / xhr.total) * 100);
+                    bar.style.width = pct + '%';
+                    barText.textContent = pct + '%';
+                }
+            },
+            (err) => {
+                // Error
+                barText.textContent = '❌ Failed to load image (check URL / CORS)';
+                console.error(err);
+            }
+        );
 
-            scene.add(sphere);
+        // ─── CAMERA ────────────────────────────────────────────────
+        camera.position.set(0, 0, 0);
+        let fov = 75;
+
+        // ─── DRAG CONTROLS ─────────────────────────────────────────
+        let isDown = false, px = 0, py = 0;
+        let lon = 0, lat = 0;
+
+        renderer.domElement.addEventListener('pointerdown', (e) => {
+            isDown = true;
+            px = e.clientX;
+            py = e.clientY;
+            renderer.domElement.style.cursor = 'grabbing';
+        });
+        window.addEventListener('pointerup', () => {
+            isDown = false;
+            renderer.domElement.style.cursor = 'grab';
+        });
+        window.addEventListener('pointermove', (e) => {
+            if (!isDown) return;
+            lon -= (e.clientX - px) * 0.15;
+            lat  = Math.max(-85, Math.min(85, lat + (e.clientY - py) * 0.15));
+            px = e.clientX;
+            py = e.clientY;
         });
 
-        // Camera position
-        camera.position.set(0, 0, 0.1); // Slightly in front of the center
+        // ─── TOUCH CONTROLS ────────────────────────────────────────
+        let lx = 0, ly = 0, lastPinchDist = null;
 
-        // Animation function
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                lx = e.touches[0].clientX;
+                ly = e.touches[0].clientY;
+            }
+            if (e.touches.length === 2) lastPinchDist = null;
+        });
+
+        renderer.domElement.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (e.touches.length === 1) {
+                lon -= (e.touches[0].clientX - lx) * 0.15;
+                lat  = Math.max(-85, Math.min(85, lat + (e.touches[0].clientY - ly) * 0.15));
+                lx = e.touches[0].clientX;
+                ly = e.touches[0].clientY;
+            }
+            if (e.touches.length === 2) {
+                const dx   = e.touches[0].clientX - e.touches[1].clientX;
+                const dy   = e.touches[0].clientY - e.touches[1].clientY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (lastPinchDist !== null) {
+                    fov -= (dist - lastPinchDist) * 0.1;
+                    fov  = Math.max(30, Math.min(100, fov));
+                    camera.fov = fov;
+                    camera.updateProjectionMatrix();
+                }
+                lastPinchDist = dist;
+            }
+        }, { passive: false });
+
+        // ─── SCROLL ZOOM ───────────────────────────────────────────
+        window.addEventListener('wheel', (e) => {
+            fov += e.deltaY * 0.05;
+            fov  = Math.max(30, Math.min(100, fov));
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        // ─── ZOOM BUTTONS ──────────────────────────────────────────
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            fov  = Math.max(30, fov - 5);
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            fov  = Math.min(100, fov + 5);
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+        });
+
+        // ─── RESIZE ────────────────────────────────────────────────
+        window.addEventListener('resize', () => {
+            camera.aspect = innerWidth / innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(innerWidth, innerHeight);
+        });
+
+        // ─── RENDER LOOP ───────────────────────────────────────────
         function animate() {
             requestAnimationFrame(animate);
-
-            // Rotate the sphere to allow 360-degree view
-            scene.rotation.y += 0.001; // Slow rotation for demonstration
-
+            const phi   = THREE.MathUtils.degToRad(90 - lat);
+            const theta = THREE.MathUtils.degToRad(lon);
+            camera.lookAt(
+                500 * Math.sin(phi) * Math.cos(theta),
+                500 * Math.cos(phi),
+                500 * Math.sin(phi) * Math.sin(theta)
+            );
             renderer.render(scene, camera);
         }
-
         animate();
+
+        renderer.domElement.style.cursor = 'grab';
     </script>
 </body>
 </html>
