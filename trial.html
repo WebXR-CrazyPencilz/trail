@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Image Viewer</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load the 360-degree image as a texture
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load('https://momento360.com/e/u/80090d2af4ca428088e42ce80f6272a9?utm_campaign=embed&utm_source=other&heading=-289.94&pitch=7.8&field-of-view=75&size=medium&display-plan=true', () => {
+            // Create a sphere geometry to wrap the texture around
+            const geometry = new THREE.SphereGeometry(500, 60, 40);
+            geometry.scale(-1, 1, 1); // Flip the geometry inside-out
+
+            const material = new THREE.MeshBasicMaterial({ map: texture });
+            const sphere = new THREE.Mesh(geometry, material);
+
+            scene.add(sphere);
+        });
+
+        // Camera position
+        camera.position.set(0, 0, 0.1); // Slightly in front of the center
+
+        // Animation function
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the sphere to allow 360-degree view
+            scene.rotation.y += 0.001; // Slow rotation for demonstration
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
