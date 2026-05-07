@@ -31,8 +31,11 @@
   });
 
   function fpGo(roomKey) {
-    if (window.AppView) window.AppView.switchTo('360');
-    if (typeof loadRoom === 'function') loadRoom(roomKey);
+
+  if(typeof enterViewer === 'function'){
+    enterViewer(roomKey)
   }
+
+}
 
 })();
