@@ -9,7 +9,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
 
-    /* PANEL */
+    /* ── PANEL ────────────────────────────────────────────────── */
     #side-panel {
       position: fixed;
       left: 0;
@@ -24,21 +24,17 @@
       overflow-y: auto;
     }
 
-    #side-panel.open {
-      transform: translateX(0);
-    }
+    #side-panel.open { transform: translateX(0); }
 
     #side-panel.open + #toggle,
-    #toggle.open {
-      left: 260px; /* same as panel width */
-    }
+    #toggle.open { left: 260px; }
 
-    /* TOGGLE BUTTON */
+    /* ── TOGGLE ARROW BUTTON ──────────────────────────────────── */
     #toggle {
       position: fixed;
       top: 50%;
       left: 0;
-      transform: translateY(-50%); /* perfect vertical center */
+      transform: translateY(-50%);
       z-index: 200;
       width: 42px;
       height: 90px;
@@ -54,7 +50,7 @@
       outline: none;
     }
 
-    /* ROOM BUTTON */
+    /* ── ROOM BUTTONS ─────────────────────────────────────────── */
     .room-btn {
       position: relative;
       height: 70px;
@@ -65,7 +61,6 @@
       border: none;
     }
 
-    /* Thumbnail image */
     .room-btn .thumb {
       position: absolute;
       inset: 0;
@@ -80,21 +75,18 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+      background: linear-gradient(to right, rgba(0,0,0,0.6), transparent);
     }
+
     canvas {
-      position:fixed !important;
-      top:0; left:0;
-      width:100% !important;
-      height:100% !important;
+      position: fixed !important;
+      top: 0; left: 0;
+      width: 100% !important;
+      height: 100% !important;
     }
 
-    /* Hover effect */
-    .room-btn:hover .thumb {
-      filter: brightness(0.8);
-    }
+    .room-btn:hover .thumb { filter: brightness(0.8); }
 
-    /* Room text */
     .room-name {
       position: absolute;
       bottom: 8px;
@@ -105,25 +97,14 @@
       letter-spacing: 0.5px;
     }
 
-    /* Active state */
-    .room-btn.active {
-      outline: 2px solid rgba(255, 255, 255, 0.6);
-    }
+    .room-btn.active { outline: 2px solid rgba(255,255,255,0.6); }
+    .room-btn:hover  { background: rgba(255,255,255,0.1); }
+    .room-btn.active { background: rgba(255,255,255,0.2); }
 
-    .room-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .room-btn.active {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
+    /* ── ROTATE WARNING ───────────────────────────────────────── */
     #rotate-warning {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: #000;
       color: white;
       align-items: center;
@@ -132,34 +113,36 @@
       z-index: 999;
       text-align: center;
       padding: 20px;
-      display: none; /* JS controls this via orientation check */
+      display: none;
     }
 
-    /* LABEL */
+    /* ── ROOM LABEL ───────────────────────────────────────────── */
     #room-label {
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       color: white;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0,0,0,0.6);
       padding: 8px 20px;
       border-radius: 20px;
+      z-index: 90;
+      pointer-events: none;
     }
 
-    /* Room number badge */
+    /* ── ROOM NUMBER BADGE ────────────────────────────────────── */
     .room-num {
       position: absolute;
       top: 8px;
       left: 10px;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255,255,255,0.7);
       font-size: 10px;
       font-weight: 600;
       letter-spacing: 1px;
       z-index: 2;
     }
 
-    /* Fade overlay for room transitions */
+    /* ── FADE OVERLAY ─────────────────────────────────────────── */
     #fade-overlay {
       position: fixed;
       inset: 0;
@@ -175,54 +158,133 @@
       pointer-events: all;
     }
 
-    /* Panel footer */
+    /* ── PANEL FOOTER ─────────────────────────────────────────── */
     #panel-footer {
       padding: 10px;
       text-align: center;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255,255,255,0.4);
       font-size: 11px;
       letter-spacing: 2px;
     }
 
-    /* Remove visible scrollbar but keep functionality */
-    #side-panel::-webkit-scrollbar {
-      width: 0px;  /* Hide scrollbar */
+    /* Hide scrollbar cross-browser */
+    #side-panel::-webkit-scrollbar { width: 0; }
+    #side-panel::-webkit-scrollbar-track,
+    #side-panel::-webkit-scrollbar-thumb { background: transparent; }
+    #side-panel { scrollbar-width: none; }
+
+    /* ── VIEW SWITCH PILL ─────────────────────────────────────── */
+    /*
+     * A pill toggle centered at the top of the screen.
+     * Two segments: [⊞ FLOOR PLAN]  [⊙ 360° VIEW]
+     * The active segment gets a white-ish highlight, the track slides.
+     */
+    #view-switch {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 4px;
+      gap: 2px;
+      user-select: none;
     }
 
-    #side-panel::-webkit-scrollbar-track {
-      background: transparent;  /* Make the track invisible */
+    .vs-btn {
+      position: relative;
+      z-index: 1;
+      padding: 7px 18px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 11px;
+      font-family: inherit;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      outline: none;
     }
 
-    #side-panel::-webkit-scrollbar-thumb {
-      background: transparent;  /* Make the thumb invisible */
+    .vs-btn svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      flex-shrink: 0;
     }
 
-    /* Firefox */
-    #side-panel {
-      scrollbar-width: none; /* Hide the scrollbar in Firefox */
+    /* Sliding active pill track */
+    #vs-track {
+      position: absolute;
+      top: 4px;
+      height: calc(100% - 8px);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .vs-btn.active {
+      color: rgba(255, 255, 255, 0.95);
     }
   </style>
 </head>
 
 <body>
 
+  <!-- ── VIEW SWITCH PILL ──────────────────────────────────────── -->
+  <div id="view-switch">
+    <div id="vs-track"></div>
+
+    <button class="vs-btn" id="btn-fp" onclick="AppView.switchTo('floorplan')" aria-label="Floor Plan view">
+      <!-- Grid / plan icon -->
+      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      Floor Plan
+    </button>
+
+    <button class="vs-btn active" id="btn-360" onclick="AppView.switchTo('360')" aria-label="360° view">
+      <!-- 360 sphere icon -->
+      <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" fill="none"/><ellipse cx="8" cy="8" rx="3" ry="7" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5"/></svg>
+      360° View
+    </button>
+  </div>
+
+  <!-- ── PANEL TOGGLE ARROW ────────────────────────────────────── -->
   <div id="toggle" aria-label="Toggle side panel">❯</div>
 
+  <!-- ── FADE OVERLAY ──────────────────────────────────────────── -->
   <div id="fade-overlay"></div>
 
+  <!-- ── SIDE PANEL ────────────────────────────────────────────── -->
   <div id="side-panel">
     <div id="room-list"></div>
     <div id="panel-footer"></div>
   </div>
 
+  <!-- ── ROOM LABEL ────────────────────────────────────────────── -->
   <div id="room-label">LOBBY</div>
+
+  <!-- ── ROTATE WARNING ────────────────────────────────────────── -->
   <div id="rotate-warning">
     🔄 Please rotate your device to landscape
   </div>
 
+  <!-- ── ORIENTATION CHECK ─────────────────────────────────────── -->
   <script>
-    // Portrait warning for mobile
-    function checkOrientation() {
+    function checkOrientation () {
       const warn = document.getElementById('rotate-warning')
       if (!warn) return
       const isPortrait = window.innerHeight > window.innerWidth && window.innerWidth <= 768
@@ -233,8 +295,102 @@
     checkOrientation()
   </script>
 
+  <!-- ── APP VIEW CONTROLLER ───────────────────────────────────── -->
+  <!--
+    AppView is the ONLY bridge between floorplan.js and main.js.
+    It controls which layer is visible and which UI chrome is shown.
+    Neither main.js nor floorplan.js call each other directly.
+  -->
+  <script>
+    window.AppView = (function () {
+      // Elements that belong exclusively to the 360 viewer
+      const viewer360Els = () => [
+        document.getElementById('room-label'),
+        document.getElementById('toggle'),
+        document.getElementById('side-panel'),
+      ]
+
+      // The Three.js canvas is appended by main.js at runtime
+      function getCanvas () { return document.querySelector('canvas') }
+
+      let currentView = '360'
+
+      function switchTo (view) {
+        if (view === currentView) return
+        currentView = view
+
+        // ── Pill track animation ─────────────────────────────────
+        const pillFP  = document.getElementById('btn-fp')
+        const pill360 = document.getElementById('btn-360')
+        const track   = document.getElementById('vs-track')
+
+        const activeBtn = view === 'floorplan' ? pillFP : pill360
+        const inactiveBtn = view === 'floorplan' ? pill360 : pillFP
+
+        if (activeBtn && inactiveBtn && track) {
+          pillFP.classList.toggle('active', view === 'floorplan')
+          pill360.classList.toggle('active', view === '360')
+
+          // Position the sliding track under the active button
+          const switchEl = document.getElementById('view-switch')
+          const switchRect = switchEl.getBoundingClientRect()
+          const activeRect = activeBtn.getBoundingClientRect()
+          track.style.left  = (activeRect.left - switchRect.left) + 'px'
+          track.style.width = activeRect.width + 'px'
+        }
+
+        if (view === 'floorplan') {
+          // Hide 360 chrome
+          viewer360Els().forEach(el => { if (el) el.style.visibility = 'hidden' })
+          const cvs = getCanvas()
+          if (cvs) cvs.style.visibility = 'hidden'
+
+          // Show floorplan layer (floorplan.js owns this)
+          if (window.FloorPlan) window.FloorPlan.show()
+
+        } else {
+          // Hide floorplan layer
+          if (window.FloorPlan) window.FloorPlan.hide()
+
+          // Show 360 chrome
+          viewer360Els().forEach(el => { if (el) el.style.visibility = 'visible' })
+          const cvs = getCanvas()
+          if (cvs) cvs.style.visibility = 'visible'
+        }
+      }
+
+      // Init: position the sliding track on the default active button (360)
+      function init () {
+        // Run after DOM paint so getBoundingClientRect is accurate
+        requestAnimationFrame(() => {
+          const track   = document.getElementById('vs-track')
+          const pill360 = document.getElementById('btn-360')
+          const switchEl = document.getElementById('view-switch')
+          if (!track || !pill360 || !switchEl) return
+          const switchRect = switchEl.getBoundingClientRect()
+          const btnRect    = pill360.getBoundingClientRect()
+          track.style.left  = (btnRect.left - switchRect.left) + 'px'
+          track.style.width = btnRect.width + 'px'
+        })
+      }
+
+      document.addEventListener('DOMContentLoaded', init)
+      // Also init after a short delay in case scripts load fast
+      setTimeout(init, 100)
+
+      return { switchTo, current: () => currentView }
+    })()
+  </script>
+
+  <!-- ── THREE.JS ───────────────────────────────────────────────── -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- ── 360 VIEWER (main.js) ──────────────────────────────────── -->
   <script src="main.js"></script>
+
+  <!-- ── FLOORPLAN (floorplan.js) ──────────────────────────────── -->
+  <!-- Loaded AFTER main.js so loadRoom is already global -->
+  <script src="floorplan.js"></script>
 
 </body>
 </html>
