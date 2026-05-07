@@ -31,17 +31,8 @@
   });
 
   function fpGo(roomKey) {
-
-  if (typeof loadRoom === 'function') {
-    loadRoom(roomKey);
+    if (window.AppView) window.AppView.switchTo('360');
+    if (typeof loadRoom === 'function') loadRoom(roomKey);
   }
-
-  const overlay = document.getElementById('floorplan-overlay');
-
-  if (overlay) {
-    overlay.style.display = 'none';
-  }
-
-}
 
 })();

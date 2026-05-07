@@ -195,7 +195,6 @@ let labelSprites  = []
 let camRX = 0, camRY = 0
 let isTransitioning = false
 const minFov = 30, maxFov = 90
-let appMode = 'floorplan'
 
 // ─── TEXTURE CACHE ─────────────────────────────────────────────
 const textureCache = {}
@@ -604,24 +603,4 @@ function animate(ts) {
 buildPanel()
 preloadInitial()
 loadRoom('foyer')
-enterFloorplan()
 animate(0)
-/* ─────────────────────────────────────
-   FLOORPLAN SWITCH
-───────────────────────────────────── */
-
-const fpSwitch = document.getElementById('fp-switch');
-
-fpSwitch.addEventListener('click', () => {
-
-  const overlay = document.getElementById('floorplan-overlay');
-
-  if (!overlay) return;
-
-  const isVisible =
-    overlay.style.display === 'flex';
-
-  overlay.style.display =
-    isVisible ? 'none' : 'flex';
-
-});
