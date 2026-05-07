@@ -2,16 +2,14 @@
   'use strict'
 
   // ─── FLOORPLAN IMAGE ────────────────────────────────────────────
-  // Replace this URL with your actual floorplan image
   const FP_IMAGE_URL = 'https://ik.imagekit.io/pwzaetheh/24-4BHK%20%20F_Even%20Floor_TOP%20VIEW_Enlarged_Tower_03.jpg?updatedAt=1777903887248'
 
   // ─── STATE ──────────────────────────────────────────────────────
-  let activeZone = null
+  let zonesBuilt = false
 
   // ─── INJECT FLOORPLAN LAYER HTML ────────────────────────────────
-  // Creates: #fp-layer (container), #fp-img (the plan image), #fp-svg (polygon overlay)
   function injectLayer () {
-    if (document.getElementById('fp-layer')) return // already injected
+    if (document.getElementById('fp-layer')) return
 
     const layer = document.createElement('div')
     layer.id = 'fp-layer'
@@ -25,8 +23,6 @@
       background: rgba(8, 8, 10, 0.92);
     `
 
-
-    // Floorplan image
     const img = document.createElement('img')
     img.id = 'fp-img'
     img.alt = 'Floor Plan'
@@ -39,10 +35,9 @@
       border-radius: 6px;
       display: block;
       user-select: none;
-      -webkit-user-drag: none
-      `
+      -webkit-user-drag: none;
+    `
 
-    // SVG overlay — sized via JS once image loads
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     svg.id = 'fp-svg'
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
@@ -52,7 +47,6 @@
       overflow: visible;
     `
 
-    // Tooltip label
     const tip = document.createElement('div')
     tip.id = 'fp-tip'
     tip.style.cssText = `
@@ -80,24 +74,32 @@
     layer.appendChild(tip)
     document.body.appendChild(layer)
 
-    // Load the floorplan image then size SVG to match
-    img.onload = function () {
-      sizeSVG()
-    }
+    // Preload image so naturalWidth/naturalHeight are ready
     img.src = FP_IMAGE_URL
 
-    window.addEventListener('resize', sizeSVG)
+    window.addEventListener('resize', () => {
+      // Only re-sync if the layer is currently visible
+      const l = document.getElementById('fp-layer')
+      if (l && l.style.display !== 'none') sizeSVG()
+    })
   }
 
   // ─── SIZE SVG TO MATCH RENDERED IMAGE ───────────────────────────
+  // IMPORTANT: only call this when the layer is visible (display:flex)
+  // otherwise getBoundingClientRect() returns zeros
   function sizeSVG () {
     const img = document.getElementById('fp-img')
     const svg = document.getElementById('fp-svg')
     if (!img || !svg) return
 
     const rect = img.getBoundingClientRect()
+
+    // Guard: if rect is zero the layer isn't visible yet — skip
+    if (rect.width === 0 || rect.height === 0) return
+
     svg.setAttribute('width',  rect.width)
     svg.setAttribute('height', rect.height)
+    // Use real image dimensions for viewBox so polygon coords map correctly
     svg.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`)
     svg.style.left   = rect.left + 'px'
     svg.style.top    = rect.top  + 'px'
@@ -106,7 +108,6 @@
   }
 
   // ─── ZONES DEFINITION ───────────────────────────────────────────
-  // Coordinates match the original floorplan.js — untouched
   const zones = [
     { room: 'living',        label: 'Living & Dining',    points: '478,206 702,206 702,506 478,506',  fill: 'rgba(0,220,0,0.18)',    stroke: 'rgba(0,220,0,0.9)' },
     { room: 'masterBedroom', label: 'Master Bedroom',     points: '235,184 356,184 356,455 235,455',  fill: 'rgba(255,200,0,0.18)',  stroke: 'rgba(255,200,0,0.9)' },
@@ -122,8 +123,9 @@
     const svg = document.getElementById('fp-svg')
     if (!svg) return
 
-    // Clear existing
-    while (svg.firstChild) svg.removeChild(svg.firstChild)
+    // Only build once — no need to rebuild every show()
+    if (zonesBuilt) return
+    zonesBuilt = true
 
     zones.forEach(zone => {
       const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
@@ -177,23 +179,25 @@
   }
 
   // ─── SWITCH TO 360 VIEWER ───────────────────────────────────────
-  // Tells AppView to show the 360 layer, then fires loadRoom in main.js
   function goTo360 (roomKey) {
     if (window.AppView) window.AppView.switchTo('360')
-    // loadRoom is global from main.js
-    if (typeof loadRoom === 'function') {
-      loadRoom(roomKey)
-    }
+    if (typeof loadRoom === 'function') loadRoom(roomKey)
   }
 
   // ─── SHOW / HIDE FLOORPLAN LAYER ────────────────────────────────
-  // Called by AppView — floorplan.js owns its own visibility
   function show () {
     const layer = document.getElementById('fp-layer')
     if (!layer) return
+
+    // 1. Make layer visible FIRST
     layer.style.display = 'flex'
-    sizeSVG()           // re-sync SVG position after layout shift
-    buildZones()        // rebuild in case SVG was cleared
+
+    // 2. Wait one frame so the browser has laid out the image
+    //    THEN size the SVG (getBoundingClientRect needs layout to be done)
+    requestAnimationFrame(() => {
+      sizeSVG()
+      buildZones()
+    })
   }
 
   function hide () {
