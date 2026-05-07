@@ -25,6 +25,7 @@
       background: rgba(8, 8, 10, 0.92);
     `
 
+
     // Floorplan image
     const img = document.createElement('img')
     img.id = 'fp-img'
