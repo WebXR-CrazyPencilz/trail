@@ -109,7 +109,7 @@
 
   // ─── ZONES DEFINITION ───────────────────────────────────────────
   const zones = [
-    { room: 'living',        label: 'Living & Dining',    points: '4000,206 702,206 702,506 478,506',  fill: 'rgba(0,220,0,0.18)',    stroke: 'rgba(0,220,0,0.9)' },
+    { room: 'living',        label: 'Living & Dining',    points: '4000,206 4007,206 702,506 478,506',  fill: 'rgba(0,220,0,0.18)',    stroke: 'rgba(0,220,0,0.9)' },
     { room: 'masterBedroom', label: 'Master Bedroom',     points: '235,184 356,184 356,455 235,455',  fill: 'rgba(255,200,0,0.18)',  stroke: 'rgba(255,200,0,0.9)' },
     { room: 'kidsBedroom',   label: 'Kids Bedroom',       points: '360,248 475,248 475,506 360,506',  fill: 'rgba(60,140,255,0.18)', stroke: 'rgba(60,140,255,0.9)' },
     { room: 'guestBedroom1', label: 'Guest Bedroom',      points: '704,248 820,248 820,455 704,455',  fill: 'rgba(255,80,140,0.18)', stroke: 'rgba(255,80,140,0.9)' },
