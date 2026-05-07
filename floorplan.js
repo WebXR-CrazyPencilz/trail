@@ -31,15 +31,16 @@
     img.id = 'fp-img'
     img.alt = 'Floor Plan'
     img.style.cssText = `
-      position: absolute;
-      max-width: 88vw;
-      max-height: 88vh;
+      max-width: 92vw;
+      max-height: 92vh;
+      width: auto;
+      height: auto;
       object-fit: contain;
       border-radius: 6px;
       display: block;
       user-select: none;
-      -webkit-user-drag: none;
-    `
+      -webkit-user-drag: none
+      `
 
     // SVG overlay — sized via JS once image loads
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
