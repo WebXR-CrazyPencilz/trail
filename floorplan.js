@@ -100,7 +100,7 @@
     svg.setAttribute('width',  rect.width)
     svg.setAttribute('height', rect.height)
     // Use real image dimensions for viewBox so polygon coords map correctly
-    svg.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`)
+    svg.setAttribute('viewBox', `0 0 ${img.naturalWidth || 1277} ${img.naturalHeight || 718}`)
     svg.style.left   = rect.left + 'px'
     svg.style.top    = rect.top  + 'px'
     svg.style.width  = rect.width  + 'px'
