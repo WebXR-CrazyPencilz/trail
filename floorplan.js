@@ -32,8 +32,14 @@
 
   function fpGo(roomKey) {
 
-  if(typeof enterViewer === 'function'){
-    enterViewer(roomKey)
+  if (typeof loadRoom === 'function') {
+    loadRoom(roomKey);
+  }
+
+  const overlay = document.getElementById('floorplan-overlay');
+
+  if (overlay) {
+    overlay.style.display = 'none';
   }
 
 }

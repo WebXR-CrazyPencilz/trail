@@ -606,3 +606,22 @@ preloadInitial()
 loadRoom('foyer')
 enterFloorplan()
 animate(0)
+/* ─────────────────────────────────────
+   FLOORPLAN SWITCH
+───────────────────────────────────── */
+
+const fpSwitch = document.getElementById('fp-switch');
+
+fpSwitch.addEventListener('click', () => {
+
+  const overlay = document.getElementById('floorplan-overlay');
+
+  if (!overlay) return;
+
+  const isVisible =
+    overlay.style.display === 'flex';
+
+  overlay.style.display =
+    isVisible ? 'none' : 'flex';
+
+});
