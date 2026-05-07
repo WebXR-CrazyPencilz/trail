@@ -3,7 +3,7 @@
 
   // ─── FLOORPLAN IMAGE ────────────────────────────────────────────
   // Replace this URL with your actual floorplan image
-  const FP_IMAGE_URL = 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702080/foyer_fuoeml.jpg'
+  const FP_IMAGE_URL = 'https://ik.imagekit.io/pwzaetheh/24-4BHK%20%20F_Even%20Floor_TOP%20VIEW_Enlarged_Tower_03.jpg?updatedAt=1777903887248'
 
   // ─── STATE ──────────────────────────────────────────────────────
   let activeZone = null
