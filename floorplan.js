@@ -98,7 +98,7 @@
     const rect = img.getBoundingClientRect()
     svg.setAttribute('width',  rect.width)
     svg.setAttribute('height', rect.height)
-    svg.setAttribute('viewBox', `0 0 ${img.naturalWidth || 1056} ${img.naturalHeight || 580}`)
+    svg.setAttribute('viewBox', `0 0 ${img.naturalWidth} ${img.naturalHeight}`)
     svg.style.left   = rect.left + 'px'
     svg.style.top    = rect.top  + 'px'
     svg.style.width  = rect.width  + 'px'
