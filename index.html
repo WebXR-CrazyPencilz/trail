@@ -1,193 +1,240 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 Viewer</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { height: 100%; overflow: hidden; background: #000; }
-        canvas { display: block; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>360 Viewer</title>
 
-        #loader {
-            position: absolute; inset: 0;
-            background: #000;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: white; font-family: sans-serif;
-            z-index: 10;
-        }
-        #loader-bar-bg {
-            width: 220px; height: 4px;
-            background: #333; border-radius: 2px; margin-top: 16px;
-        }
-        #loader-bar {
-            height: 100%; width: 0%;
-            background: white; border-radius: 2px;
-            transition: width 0.2s;
-        }
-        #loader-text { font-size: 13px; margin-top: 10px; opacity: 0.6; }
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
 
-        #info {
-            position: absolute; bottom: 24px; left: 50%;
-            transform: translateX(-50%);
-            color: white; font-family: sans-serif; font-size: 13px;
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(6px);
-            padding: 8px 18px; border-radius: 20px;
-            pointer-events: none; opacity: 1;
-            transition: opacity 1s;
-        }
+    /* PANEL */
+    #side-panel {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      transform: translateX(-100%);
+      transition: 0.3s;
+      z-index: 100;
+      overflow-y: auto;
+    }
 
-        #zoom {
-            position: absolute; right: 20px; top: 50%;
-            transform: translateY(-50%);
-            display: flex; flex-direction: column; gap: 8px;
-        }
-        #zoom button {
-            width: 38px; height: 38px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(6px);
-            border: none; border-radius: 50%;
-            color: white; font-size: 20px;
-            cursor: pointer; display: flex;
-            align-items: center; justify-content: center;
-        }
-        #zoom button:hover { background: rgba(255,255,255,0.3); }
-    </style>
+    #side-panel.open {
+      transform: translateX(0);
+    }
+
+    #side-panel.open + #toggle,
+    #toggle.open {
+      left: 260px; /* same as panel width */
+    }
+
+    /* TOGGLE BUTTON */
+    #toggle {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%); /* perfect vertical center */
+      z-index: 200;
+      width: 42px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      border-radius: 0 10px 10px 0;
+      transition: left 0.3s ease;
+      outline: none;
+    }
+
+    /* ROOM BUTTON */
+    .room-btn {
+      position: relative;
+      height: 70px;
+      margin: 6px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Thumbnail image */
+    .room-btn .thumb {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.55);
+      transition: 0.3s;
+    }
+
+    .room-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent);
+    }
+    canvas {
+      position:fixed !important;
+      top:0; left:0;
+      width:100% !important;
+      height:100% !important;
+    }
+
+    /* Hover effect */
+    .room-btn:hover .thumb {
+      filter: brightness(0.8);
+    }
+
+    /* Room text */
+    .room-name {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      color: white;
+      font-size: 12px;
+      z-index: 2;
+      letter-spacing: 0.5px;
+    }
+
+    /* Active state */
+    .room-btn.active {
+      outline: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .room-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .room-btn.active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    #rotate-warning {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: white;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 999;
+      text-align: center;
+      padding: 20px;
+      display: none; /* JS controls this via orientation check */
+    }
+
+    /* LABEL */
+    #room-label {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px 20px;
+      border-radius: 20px;
+    }
+
+    /* Room number badge */
+    .room-num {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      z-index: 2;
+    }
+
+    /* Fade overlay for room transitions */
+    #fade-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #0a0a0a;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+
+    #fade-overlay.fading {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Panel footer */
+    #panel-footer {
+      padding: 10px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    /* Remove visible scrollbar but keep functionality */
+    #side-panel::-webkit-scrollbar {
+      width: 0px;  /* Hide scrollbar */
+    }
+
+    #side-panel::-webkit-scrollbar-track {
+      background: transparent;  /* Make the track invisible */
+    }
+
+    #side-panel::-webkit-scrollbar-thumb {
+      background: transparent;  /* Make the thumb invisible */
+    }
+
+    /* Firefox */
+    #side-panel {
+      scrollbar-width: none; /* Hide the scrollbar in Firefox */
+    }
+  </style>
 </head>
+
 <body>
 
-    <div id="loader">
-        <div style="font-size:15px;letter-spacing:2px;opacity:0.8">LOADING</div>
-        <div id="loader-bar-bg"><div id="loader-bar"></div></div>
-        <div id="loader-text">0%</div>
-    </div>
+  <div id="toggle" aria-label="Toggle side panel">❯</div>
 
-    <div id="info">🖱 Drag to look around &nbsp;|&nbsp; Scroll to zoom</div>
+  <div id="fade-overlay"></div>
 
-    <div id="zoom">
-        <button id="zoomIn" title="Zoom In">+</button>
-        <button id="zoomOut" title="Zoom Out">−</button>
-    </div>
+  <div id="side-panel">
+    <div id="room-list"></div>
+    <div id="panel-footer"></div>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        const scene    = new THREE.Scene();
-        const camera   = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(devicePixelRatio);
-        renderer.setSize(innerWidth, innerHeight);
-        document.body.appendChild(renderer.domElement);
+  <div id="room-label">LOBBY</div>
+  <div id="rotate-warning">
+    🔄 Please rotate your device to landscape
+  </div>
 
-        const loader  = document.getElementById('loader');
-        const bar     = document.getElementById('loader-bar');
-        const barText = document.getElementById('loader-text');
+  <script>
+    // Portrait warning for mobile
+    function checkOrientation() {
+      const warn = document.getElementById('rotate-warning')
+      if (!warn) return
+      const isPortrait = window.innerHeight > window.innerWidth && window.innerWidth <= 768
+      warn.style.display = isPortrait ? 'flex' : 'none'
+    }
+    window.addEventListener('resize', checkOrientation)
+    window.addEventListener('orientationchange', checkOrientation)
+    checkOrientation()
+  </script>
 
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(
-            'https://res.cloudinary.com/dp5ifzgge/image/upload/f_auto,q_auto/Foyer_to_living_ya79hj',
-            (texture) => {
-                const geo = new THREE.SphereGeometry(500, 60, 40);
-                geo.scale(-1, 1, 1);
-                const mat = new THREE.MeshBasicMaterial({ map: texture });
-                scene.add(new THREE.Mesh(geo, mat));
-                loader.style.display = 'none';
-                setTimeout(() => {
-                    document.getElementById('info').style.opacity = '0';
-                }, 4000);
-            },
-            (xhr) => {
-                if (xhr.total) {
-                    const pct = Math.round((xhr.loaded / xhr.total) * 100);
-                    bar.style.width = pct + '%';
-                    barText.textContent = pct + '%';
-                }
-            },
-            (err) => {
-                barText.textContent = '❌ Failed to load image (check URL / CORS)';
-                console.error(err);
-            }
-        );
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="main.js"></script>
 
-        camera.position.set(0, 0, 0);
-        let fov = 75;
-        let isDown = false, px = 0, py = 0, lon = 0, lat = 0;
-
-        renderer.domElement.addEventListener('pointerdown', (e) => {
-            isDown = true; px = e.clientX; py = e.clientY;
-            renderer.domElement.style.cursor = 'grabbing';
-        });
-        window.addEventListener('pointerup', () => {
-            isDown = false;
-            renderer.domElement.style.cursor = 'grab';
-        });
-        window.addEventListener('pointermove', (e) => {
-            if (!isDown) return;
-            lon -= (e.clientX - px) * 0.15;
-            lat  = Math.max(-85, Math.min(85, lat + (e.clientY - py) * 0.15));
-            px = e.clientX; py = e.clientY;
-        });
-
-        let lx = 0, ly = 0, lastPinchDist = null;
-        renderer.domElement.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) { lx = e.touches[0].clientX; ly = e.touches[0].clientY; }
-            if (e.touches.length === 2) lastPinchDist = null;
-        });
-        renderer.domElement.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (e.touches.length === 1) {
-                lon -= (e.touches[0].clientX - lx) * 0.15;
-                lat  = Math.max(-85, Math.min(85, lat + (e.touches[0].clientY - ly) * 0.15));
-                lx = e.touches[0].clientX; ly = e.touches[0].clientY;
-            }
-            if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (lastPinchDist !== null) {
-                    fov = Math.max(30, Math.min(100, fov - (dist - lastPinchDist) * 0.1));
-                    camera.fov = fov;
-                    camera.updateProjectionMatrix();
-                }
-                lastPinchDist = dist;
-            }
-        }, { passive: false });
-
-        window.addEventListener('wheel', (e) => {
-            fov = Math.max(30, Math.min(100, fov + e.deltaY * 0.05));
-            camera.fov = fov;
-            camera.updateProjectionMatrix();
-        });
-
-        document.getElementById('zoomIn').addEventListener('click', () => {
-            fov = Math.max(30, fov - 5);
-            camera.fov = fov; camera.updateProjectionMatrix();
-        });
-        document.getElementById('zoomOut').addEventListener('click', () => {
-            fov = Math.min(100, fov + 5);
-            camera.fov = fov; camera.updateProjectionMatrix();
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = innerWidth / innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(innerWidth, innerHeight);
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const phi   = THREE.MathUtils.degToRad(90 - lat);
-            const theta = THREE.MathUtils.degToRad(lon);
-            camera.lookAt(
-                500 * Math.sin(phi) * Math.cos(theta),
-                500 * Math.cos(phi),
-                500 * Math.sin(phi) * Math.sin(theta)
-            );
-            renderer.render(scene, camera);
-        }
-        animate();
-        renderer.domElement.style.cursor = 'grab';
-    </script>
 </body>
 </html>
