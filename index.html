@@ -313,7 +313,7 @@
       // The Three.js canvas is appended by main.js at runtime
       function getCanvas () { return document.querySelector('canvas') }
 
-      let currentView = '360'
+      let currentView = 'floorplan'
 
       function switchTo (view) {
         if (view === currentView) return
@@ -364,7 +364,7 @@
         // Run after DOM paint so getBoundingClientRect is accurate
         requestAnimationFrame(() => {
           const track   = document.getElementById('vs-track')
-          const pill360 = document.getElementById('btn-360')
+          const pill360 = document.getElementById('btn-fp')
           const switchEl = document.getElementById('view-switch')
           if (!track || !pill360 || !switchEl) return
           const switchRect = switchEl.getBoundingClientRect()
