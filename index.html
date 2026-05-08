@@ -109,9 +109,15 @@
     }
 
     @media (max-width: 480px) {
-      .vs-btn { padding: 7px 14px; font-size: 9px; letter-spacing: 1.5px; }
-    }
+  /* Step 1 — Pill shrinks */
+        .vs-btn { padding: 6px 12px; font-size: 9px; letter-spacing: 1px; }
+        #view-switch { top: 12px; }
 
+  /* Step 2 — Panel goes full width */
+        #side-panel { width: 100%; }
+        #toggle.open { left: 100%; }
+      }
+      
     /* ══════════════════════════════════════════
        PANEL TOGGLE ARROW
     ══════════════════════════════════════════ */
