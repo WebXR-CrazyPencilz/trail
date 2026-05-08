@@ -1,16 +1,30 @@
 ;(function () {
   'use strict'
 
-  // ─── FLOORPLAN IMAGE ────────────────────────────────────────────
+  // ─── CONFIG ─────────────────────────────────────────────────────
   const FP_IMAGE_URL = 'https://ik.imagekit.io/pwzaetheh/24-4BHK%20%20F_Even%20Floor_TOP%20VIEW_Enlarged_Tower_03.jpg?updatedAt=1777903887248'
 
-  // ─── STATE ──────────────────────────────────────────────────────
-  let zonesBuilt = false
+  // The viewBox matches the image's natural pixel size.
+  // All polygon coordinates are based on these dimensions.
+  const VP_W = 1009
+  const VP_H = 567
 
-  // ─── INJECT FLOORPLAN LAYER HTML ────────────────────────────────
+  // ─── ZONES ──────────────────────────────────────────────────────
+  const zones = [
+    { room: 'living',        label: 'Living & Dining',  points: '478,206 702,206 702,506 478,506',  fill: 'rgba(0,220,0,0.18)',    stroke: 'rgba(0,220,0,0.9)' },
+    { room: 'masterBedroom', label: 'Master Bedroom',   points: '235,184 356,184 356,455 235,455',  fill: 'rgba(255,200,0,0.18)',  stroke: 'rgba(255,200,0,0.9)' },
+    { room: 'kidsBedroom',   label: 'Kids Bedroom',     points: '360,248 475,248 475,506 360,506',  fill: 'rgba(60,140,255,0.18)', stroke: 'rgba(60,140,255,0.9)' },
+    { room: 'guestBedroom1', label: 'Guest Bedroom',    points: '704,248 820,248 820,455 704,455',  fill: 'rgba(255,80,140,0.18)', stroke: 'rgba(255,80,140,0.9)' },
+    { room: 'kitchen',       label: 'Kitchen',          points: '482,70 705,70 705,205 482,205',    fill: 'rgba(255,80,80,0.18)',  stroke: 'rgba(255,80,80,0.9)' },
+    { room: 'guestBedroom2', label: 'Guest Bedroom 2',  points: '236,70 478,70 478,188 236,188',    fill: 'rgba(180,60,255,0.18)', stroke: 'rgba(180,60,255,0.9)' },
+    { room: 'foyer',         label: 'Foyer / Lobby',    points: '705,67 820,67 820,248 705,248',    fill: 'rgba(0,204,204,0.18)',  stroke: 'rgba(0,204,204,0.9)' }
+  ]
+
+  // ─── INJECT LAYER ───────────────────────────────────────────────
   function injectLayer () {
     if (document.getElementById('fp-layer')) return
 
+    // ── Outer container (fullscreen dark backdrop)
     const layer = document.createElement('div')
     layer.id = 'fp-layer'
     layer.style.cssText = `
@@ -23,30 +37,53 @@
       background: rgba(8, 8, 10, 0.92);
     `
 
+    // ── Wrapper: image + SVG stacked on top of each other
+    //    The KEY idea from R&D: SVG is position:absolute inside
+    //    a position:relative wrapper, so it always matches the image.
+    const wrap = document.createElement('div')
+    wrap.style.cssText = `
+      position: relative;
+      display: inline-block;
+      line-height: 0;
+      border-radius: 6px;
+      overflow: hidden;
+    `
+
+    // ── The floorplan image
     const img = document.createElement('img')
     img.id = 'fp-img'
     img.alt = 'Floor Plan'
+    img.src = FP_IMAGE_URL
     img.style.cssText = `
+      display: block;
       max-width: 92vw;
-      max-height: 92vh;
+      max-height: 88vh;
       width: auto;
       height: auto;
-      object-fit: contain;
       border-radius: 6px;
-      display: block;
       user-select: none;
       -webkit-user-drag: none;
     `
 
+    // ── SVG overlay — sits exactly on top of the image
+    //    width:100% height:100% means it always matches image size.
+    //    viewBox uses the image's natural pixel dimensions,
+    //    so all polygon coordinates are always correct — no JS math needed!
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     svg.id = 'fp-svg'
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    svg.setAttribute('viewBox', `0 0 ${VP_W} ${VP_H}`)
+    svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
     svg.style.cssText = `
       position: absolute;
-      pointer-events: all;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
       overflow: visible;
     `
 
+    // ── Tooltip
     const tip = document.createElement('div')
     tip.id = 'fp-tip'
     tip.style.cssText = `
@@ -69,79 +106,70 @@
       z-index: 20;
     `
 
-    layer.appendChild(img)
-    layer.appendChild(svg)
+    wrap.appendChild(img)
+    wrap.appendChild(svg)
+    layer.appendChild(wrap)
     layer.appendChild(tip)
     document.body.appendChild(layer)
 
-    // Preload image so naturalWidth/naturalHeight are ready
-    img.src = FP_IMAGE_URL
-
-    window.addEventListener('resize', () => {
-      // Only re-sync if the layer is currently visible
-      const l = document.getElementById('fp-layer')
-      if (l && l.style.display !== 'none') sizeSVG()
-    })
+    // Build zones once image is loaded
+    img.addEventListener('load', buildZones)
+    // If image was cached and already loaded
+    if (img.complete) buildZones()
   }
-
-  // ─── SIZE SVG TO MATCH RENDERED IMAGE ───────────────────────────
-  // IMPORTANT: only call this when the layer is visible (display:flex)
-  // otherwise getBoundingClientRect() returns zeros
-  function sizeSVG () {
-    const img = document.getElementById('fp-img')
-    const svg = document.getElementById('fp-svg')
-    if (!img || !svg) return
-
-    const rect = img.getBoundingClientRect()
-
-    // Guard: if rect is zero the layer isn't visible yet — skip
-    if (rect.width === 0 || rect.height === 0) return
-
-    svg.setAttribute('width',  rect.width)
-    svg.setAttribute('height', rect.height)
-    // Use real image dimensions for viewBox so polygon coords map correctly
-    svg.setAttribute('viewBox', `0 0 ${img.naturalWidth || 1277} ${img.naturalHeight || 718}`)
-    svg.style.left   = rect.left + 'px'
-    svg.style.top    = rect.top  + 'px'
-    svg.style.width  = rect.width  + 'px'
-    svg.style.height = rect.height + 'px'
-  }
-
-  // ─── ZONES DEFINITION ───────────────────────────────────────────
-  const zones = [
-    { room: 'living',        label: 'Living & Dining',    points: '3000,206 3137,206 702,506 478,506',  fill: 'rgba(0,220,0,0.18)',    stroke: 'rgba(0,220,0,0.9)' },
-    { room: 'masterBedroom', label: 'Master Bedroom',     points: '235,184 356,184 356,455 235,455',  fill: 'rgba(255,200,0,0.18)',  stroke: 'rgba(255,200,0,0.9)' },
-    { room: 'kidsBedroom',   label: 'Kids Bedroom',       points: '360,248 475,248 475,506 360,506',  fill: 'rgba(60,140,255,0.18)', stroke: 'rgba(60,140,255,0.9)' },
-    { room: 'guestBedroom1', label: 'Guest Bedroom',      points: '704,248 820,248 820,455 704,455',  fill: 'rgba(255,80,140,0.18)', stroke: 'rgba(255,80,140,0.9)' },
-    { room: 'kitchen',       label: 'Kitchen',            points: '482,70 705,70 705,205 482,205',    fill: 'rgba(255,80,80,0.18)',  stroke: 'rgba(255,80,80,0.9)' },
-    { room: 'guestBedroom2', label: 'Guest Bedroom 2',    points: '236,70 478,70 478,188 236,188',    fill: 'rgba(180,60,255,0.18)', stroke: 'rgba(180,60,255,0.9)' },
-    { room: 'foyer',         label: 'Foyer / Lobby',      points: '705,67 820,67 820,248 705,248',    fill: 'rgba(0,204,204,0.18)',  stroke: 'rgba(0,204,204,0.9)' }
-  ]
 
   // ─── BUILD POLYGON ZONES ─────────────────────────────────────────
-  function buildZones () {
-    const svg = document.getElementById('fp-svg')
-    if (!svg) return
+  let zonesBuilt = false
 
-    // Only build once — no need to rebuild every show()
+  function buildZones () {
     if (zonesBuilt) return
     zonesBuilt = true
 
+    const svg = document.getElementById('fp-svg')
+    if (!svg) return
+
     zones.forEach(zone => {
+      // Polygon shape
       const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon')
       poly.setAttribute('class', 'fpz')
       poly.setAttribute('points', zone.points)
       poly.setAttribute('fill', zone.fill)
       poly.setAttribute('stroke', zone.stroke)
       poly.setAttribute('stroke-width', '2')
+      poly.setAttribute('vector-effect', 'non-scaling-stroke')
       poly.dataset.room  = zone.room
       poly.dataset.label = zone.label
-      poly.style.cursor  = 'pointer'
-      poly.style.transition = 'filter 0.15s'
+      poly.style.cssText = `
+        cursor: pointer;
+        pointer-events: all;
+        transition: filter 0.15s;
+      `
       svg.appendChild(poly)
+
+      // Label text in the center of each zone
+      const pts = zone.points.trim().split(/\s+/).map(p => p.split(',').map(Number))
+      const cx  = pts.reduce((s, p) => s + p[0], 0) / pts.length
+      const cy  = pts.reduce((s, p) => s + p[1], 0) / pts.length
+
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+      text.setAttribute('x', cx)
+      text.setAttribute('y', cy)
+      text.setAttribute('text-anchor', 'middle')
+      text.setAttribute('dominant-baseline', 'middle')
+      text.setAttribute('fill', '#fff')
+      text.setAttribute('font-size', '13')
+      text.setAttribute('font-weight', '600')
+      text.setAttribute('letter-spacing', '1')
+      text.setAttribute('paint-order', 'stroke fill')
+      text.setAttribute('stroke', 'rgba(0,0,0,0.7)')
+      text.setAttribute('stroke-width', '3')
+      text.setAttribute('stroke-linejoin', 'round')
+      text.setAttribute('pointer-events', 'none')
+      text.textContent = zone.label
+      svg.appendChild(text)
     })
 
-    // Hover
+    // ── Hover effect
     svg.addEventListener('mouseover', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
@@ -156,12 +184,11 @@
       hideTip()
     })
 
-    // Click → switch to 360 viewer
+    // ── Click → go to 360 viewer
     svg.addEventListener('click', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
-      const roomKey = z.dataset.room
-      if (roomKey) goTo360(roomKey)
+      goTo360(z.dataset.room)
     })
   }
 
@@ -178,26 +205,17 @@
     if (tip) tip.style.opacity = '0'
   }
 
-  // ─── SWITCH TO 360 VIEWER ───────────────────────────────────────
+  // ─── GO TO 360 ───────────────────────────────────────────────────
   function goTo360 (roomKey) {
     if (window.AppView) window.AppView.switchTo('360')
     if (typeof loadRoom === 'function') loadRoom(roomKey)
   }
 
-  // ─── SHOW / HIDE FLOORPLAN LAYER ────────────────────────────────
+  // ─── SHOW / HIDE ─────────────────────────────────────────────────
   function show () {
     const layer = document.getElementById('fp-layer')
-    if (!layer) return
-
-    // 1. Make layer visible FIRST
-    layer.style.display = 'flex'
-
-    // 2. Wait one frame so the browser has laid out the image
-    //    THEN size the SVG (getBoundingClientRect needs layout to be done)
-    requestAnimationFrame(() => {
-      sizeSVG()
-      buildZones()
-    })
+    if (layer) layer.style.display = 'flex'
+    // No sizeSVG needed — CSS + viewBox handles everything!
   }
 
   function hide () {
@@ -206,10 +224,10 @@
     hideTip()
   }
 
-  // ─── PUBLIC API ─────────────────────────────────────────────────
+  // ─── PUBLIC API ──────────────────────────────────────────────────
   window.FloorPlan = { show, hide }
 
-  // ─── INIT ───────────────────────────────────────────────────────
+  // ─── INIT ────────────────────────────────────────────────────────
   injectLayer()
 
 })()
