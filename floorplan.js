@@ -34,7 +34,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(8, 8, 10, 0.92);
+      background: #ffffff;
     `
 
     // ── Wrapper: image + SVG stacked on top of each other
