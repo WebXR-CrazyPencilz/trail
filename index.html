@@ -355,6 +355,7 @@
       top: 0; left: 0;
       width: 100% !important;
       height: 100% !important;
+      z-index: 1;
     }
 
     /* ══════════════════════════════════════════
@@ -499,6 +500,10 @@
         }
 
         if (view === 'floorplan') {
+          const panel  = document.getElementById('side-panel')
+          const toggle = document.getElementById('toggle')
+          if (panel)  panel.classList.remove('open')
+          if (toggle) { toggle.classList.remove('open'); toggle.innerHTML = '❯' }
           viewer360Els().forEach(el => { if (el) el.style.visibility = 'hidden' })
           const cvs = getCanvas()
           if (cvs) cvs.style.visibility = 'hidden'
