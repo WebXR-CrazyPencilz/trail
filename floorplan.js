@@ -91,9 +91,11 @@
       bottom: 36px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(10, 8, 5, 0.88);
-      color: #f0ebe0;
-      border: 1px solid rgba(201, 162, 58, 0.7);
+      background: linear-gradient(135deg, #c9a23a 0%, #e8c9a 60%, #c9a23a 100%);
+      color: #07060a;
+      border: none;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      font-weight: 700;
       padding: 6px 18px;
       border-radius: 20px;
       font-size: 12px;
@@ -145,9 +147,6 @@
         transition: filter 0.15s;
       `
       svg.appendChild(poly)
-
-      // Label text in the center of each zone
-
     })
 
     // ── Hover effect
