@@ -504,20 +504,20 @@
           const toggle = document.getElementById('toggle')
           if (panel)  panel.classList.remove('open')
           if (toggle) { toggle.classList.remove('open'); toggle.innerHTML = '❯' }
-          viewer360Els().forEach(el => { if (el) el.style.visibility = 'visible' })
+          viewer360Els().forEach(el => { if (el) el.style.display = 'none' })
           const cvs = getCanvas()
           if (cvs) cvs.style.display = 'none'
           if (window.FloorPlan) window.FloorPlan.show()
         } else {
           if (window.FloorPlan) window.FloorPlan.hide()
-          viewer360Els().forEach(el => { if (el) el.style.visibility = 'visible' })
+          viewer360Els().forEach(el => { if (el) el.style.display = '' })
           const cvs = getCanvas()
           if (cvs) cvs.style.display = 'block'
         }
       }
 
       function init () {
-        viewer360Els().forEach(el => { if (el) el.style.display = '' })
+        viewer360Els().forEach(el => { if (el) el.style.display = 'none' })
         const cvs = getCanvas()
         if (cvs) cvs.style.display = 'none'
         requestAnimationFrame(() => {
