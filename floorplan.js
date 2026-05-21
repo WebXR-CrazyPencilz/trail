@@ -149,12 +149,12 @@
       svg.appendChild(poly)
     })
 
-    // ── Hover effect
     svg.addEventListener('mouseover', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
       z.setAttribute('stroke', 'rgba(201,162,58,1)')
       z.setAttribute('stroke-width', '3')
+      z.style.filter = 'drop-shadow(0 0 8px rgba(201,162,58,0.9)) drop-shadow(0 0 4px rgba(255,255,255,0.6))'
       showTip(z.dataset.label || z.dataset.room)
     })
 
@@ -162,9 +162,10 @@
       const z = e.target.closest('.fpz')
       if (!z) return
       z.setAttribute('stroke', 'rgba(0,0,0,0)')
+      z.style.filter = ''
       hideTip()
     })
-
+    
     // ── Click → go to 360 viewer
     svg.addEventListener('click', e => {
       const z = e.target.closest('.fpz')
