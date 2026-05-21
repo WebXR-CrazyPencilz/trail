@@ -154,13 +154,13 @@ const hotspots = {
 
   // ── Utility ────────────────────────────────────────────────
   utility: [
-    { target: 'kitchen',         position: [6.5,  -2.2, -0.6 ] },
+    { target: 'kitchen',         position: [4.5,  -2.2, -0.6 ] },
     { target: 'staffroom',       position: [-3.0,  -2.2,  4.1 ] }
   ],
 
   // ── Staff Room ─────────────────────────────────────────────
   staffroom: [
-    { target: 'utility',         position: [ 3.1,  -2.2, -5.5 ] }
+    { target: 'utility',         position: [ 3.1,  -2.2, -4. ] }
   ]
 }
 
