@@ -18,18 +18,19 @@ const rooms = {
   kidsbedroomcorridor:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1779279656/kids_bedroom_corridor_tprzwb.jpg',     label: 'KIDS BEDROOM CORRIDOR',startYaw: .6 },
   kidsbedroom:           { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1779279741/kids_bedroom_lnnx20.jpg',             label: 'KIDS BEDROOM' },
   kidsbedroomtoilet:     { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702069/kidsbedroomtoilet_vohcxo.jpg',       label: 'KIDS BEDROOM TOILET' },
-  guestbedroomcorridor1: { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702049/guestbedroomcorridor1_ikczlt.jpg',  label: 'GUEST BEDROOM CORRIDOR' },
-  guestbedroom1:         { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702038/guestbedroom1_l9wnvg.jpg',            label: 'GUEST BEDROOM' },
-  guestbedroomtoilet1:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702060/guestbedroomtoilet1_avdzas.jpg',     label: 'GUEST BEDROOM TOILET', startYaw: -0.9  },
-  guestbedroomcorridor2: { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702072/guestbedroomcorridor2_b12rmu.jpg',    label: 'GUEST BEDROOM CORRIDOR' }, 
-  guestbedroom2:         { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702051/guestbedroom2_cdufxz.jpg',             label: 'GUEST BEDROOM' },
-  guestbedroomtoilet2:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702053/guestbedroomtoilet2_b0ae1w.jpg',     label: 'GUEST BEDROOM TOILET' },
+  guestbedroomcorridor: { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702049/guestbedroomcorridor1_ikczlt.jpg',  label: 'GUEST BEDROOM CORRIDOR' },
+  guestbedroom:         { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702038/guestbedroom1_l9wnvg.jpg',            label: 'GUEST BEDROOM' },
+  guestbedroomtoilet:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702060/guestbedroomtoilet1_avdzas.jpg',     label: 'GUEST BEDROOM TOILET', startYaw: -0.9  },
+  bedroom3corridor:      { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702072/guestbedroomcorridor2_b12rmu.jpg',    label: 'GUEST BEDROOM CORRIDOR' }, 
+  bedroom3:              { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702051/guestbedroom2_cdufxz.jpg',             label: 'GUEST BEDROOM' },
+  bedroom3toilet:        { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702053/guestbedroomtoilet2_b0ae1w.jpg',     label: 'GUEST BEDROOM TOILET' },
   staffroom:             { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702062/staffroom_sasyds.jpg',                label: 'MAIDS ROOM' }
 }
 
 const thumbnails = Object.fromEntries(
   Object.entries(rooms).map(([key, val]) => [key, { image: cloudThumb(val.image) }])
 )
+
 
 // ─── HOTSPOTS ──────────────────────────────────────────────────
 const hotspots = {
@@ -48,8 +49,7 @@ const hotspots = {
     { target: 'living',                position: [-5.5,  -2.3,  0.10] },
     { target: 'masterbedroomcorridor',        position: [ 4.5,  -2.2,  0.0 ] },
     { target: 'kidsbedroomcorridor',          position: [ 2.0,  -2.2, -4.5 ] },
-     // FIX: was guestBedroomCorridor2 only
-    { target: 'guestbedroomcorridor2', position: [ 3.0,  -2.2, 2.20 ] }  // FIX: added second corridor
+    { target: 'bedroom3corridor', position: [ 3.0,  -2.2, 2.20 ] }  // FIX: added second corridor
   ],
 
   // ── Master Corridor ────────────────────────────────────────
@@ -89,39 +89,39 @@ const hotspots = {
   // ── Guest Corridor 1 ───────────────────────────────────────
   // FIX BUG 3: back nav was 'foyerToLiving1' — wrong, should go back to
   // livingToBedroom since that's the bedroom hub it belongs to
-  guestbedroomcorridor1: [
+  guestbedroomcorridor: [
     { target: 'foyertoliving1', position: [-0.0,  -2.2,  4.0 ] }, // FIX: was foyerToLiving1
-    { target: 'guestbedroom1',   position: [ -2.5,  -2.2, -8.5 ] },
-    { target: 'guestbedroomtoilet1',    position: [ -2.50,  -2.2,  1.50 ] }
+    { target: 'guestbedroom',   position: [ -2.5,  -2.2, -8.5 ] },
+    { target: 'guestbedroomtoilet',    position: [ -2.50,  -2.2,  1.50 ] }
   ],
 
   // ── Guest Bedroom 1 ────────────────────────────────────────
-  guestbedroom1: [
-    { target: 'guestbedroomcorridor1', position: [1.30, -2.2,  6.50] }
+  guestbedroom: [
+    { target: 'guestbedroomcorridor', position: [1.30, -2.2,  6.50] }
   ],
 
   // ── Guest Toilet 1 ─────────────────────────────────────────
-  guestbedroomtoilet1: [
-    { target: 'guestbedroomcorridor1', position: [ 2.0, -2.2, -1.50] }
+  guestbedroomtoilet: [
+    { target: 'guestbedroomcorridor', position: [ 2.0, -2.2, -1.50] }
   ],
 
   // ── Guest Corridor 2 ───────────────────────────────────────
   // FIX BUG 6: back nav position was [5.0,-2.2,0.0] (positive X = wrong direction)
   // Changed to [-5.0,-2.2,0.0] so it faces the correct exit direction
-  guestbedroomcorridor2: [
+  bedroom3corridor: [
     { target: 'livingtobedroom', position: [0.90,  -2.2,  -3.0 ] }, // FIX: was [5.0,...]
-    { target: 'guestbedroom2',   position: [ 5.0,  -2.2, 3.0 ] },
-    { target: 'guestbedroomtoilet2',    position: [ -1.2,  -2.2,  2.50 ] }
+    { target: 'guest3bedroom',   position: [ 5.0,  -2.2, 3.0 ] },
+    { target: 'bedroom3toilet',    position: [ -1.2,  -2.2,  2.50 ] }
   ],
 
   // ── Guest Bedroom 2 ────────────────────────────────────────
-  guestbedroom2: [
-    { target: 'guestbedroomcorridor2', position: [-4.0, -2.2,  -3] }
+  guest3bedroom: [
+    { target: 'bedroom3corridor', position: [-4.0, -2.2,  -3] }
   ],
 
   // ── Guest Toilet 2 ─────────────────────────────────────────
-  guestbedroomtoilet2: [
-    { target: 'guestbedroomcorridor2', position: [ 2.0, -2.2, -2.0] }
+  bedroom3toilet: [
+    { target: 'bedroom3corridor', position: [ 2.0, -2.2, -2.0] }
   ],
 
   // ── Foyer ──────────────────────────────────────────────────
@@ -133,7 +133,7 @@ const hotspots = {
   foyertoliving1: [
     { target: 'foyertoliving2',        position: [ 3.5,  -2.2,  0. ] },
     { target: 'foyer',                 position: [ -2.5,  -2.2,  1.80 ] },
-    { target: 'guestbedroomcorridor1', position: [ 0.10, -2.2, -2.3 ] }
+    { target: 'guestbedroomcorridor', position: [ 0.10, -2.2, -2.3 ] }
     
   ],
 
