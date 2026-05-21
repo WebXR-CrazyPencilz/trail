@@ -153,14 +153,15 @@
     svg.addEventListener('mouseover', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
-      z.style.filter = 'brightness(1.6)'
+      z.setAttribute('stroke', 'rgba(201,162,58,1)')
+      z.setAttribute('stroke-width', '3')
       showTip(z.dataset.label || z.dataset.room)
     })
 
     svg.addEventListener('mouseout', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
-      z.style.filter = ''
+      z.setAttribute('stroke', 'rgba(0,0,0,0)')
       hideTip()
     })
 
