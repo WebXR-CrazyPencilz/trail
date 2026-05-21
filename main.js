@@ -69,7 +69,7 @@ const hotspots = {
   // ── Kids Corridor ──────────────────────────────────────────
   kidsbedroomcorridor: [
     { target: 'livingtobedroom', position: [-5.0,  -2.2, -0.2 ] },
-    { target: 'kidsbedroom',     position: [ 6.0,  -2.2, -4.5 ] },
+    { target: 'kidsbedroom',     position: [ 6.0,  -2.2, -3. ] },
     { target: 'kidsbedroomtoilet',      position: [-2.25, -2.2, -2.0 ] }
   ],
 
