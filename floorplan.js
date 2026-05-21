@@ -154,7 +154,7 @@
       if (!z) return
       z.setAttribute('stroke', 'rgba(201,162,58,1)')
       z.setAttribute('stroke-width', '3')
-      z.style.filter = 'drop-shadow(0 0 8px rgba(201,162,58,0.9)) drop-shadow(0 0 4px rgba(255,255,255,0.6))'
+      z.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,0.8))'
       showTip(z.dataset.label || z.dataset.room)
     })
 
@@ -165,7 +165,7 @@
       z.style.filter = ''
       hideTip()
     })
-    
+
     // ── Click → go to 360 viewer
     svg.addEventListener('click', e => {
       const z = e.target.closest('.fpz')
