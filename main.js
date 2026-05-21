@@ -4,7 +4,7 @@ function cloudThumb(url) {
 
 // ─── ROOMS ─────────────────────────────────────────────────────
 const rooms = {
-  foyer:                { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702080/foyer_fuoeml.jpg',                     label: 'LOBBY' , startYaw: 1.55  },
+  foyer:                 { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702080/foyer_fuoeml.jpg',                     label: 'LOBBY' , startYaw: 1.55  },
   foyertoliving1:        { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702030/foyertoliving1_zeafp8.jpg',           label: 'LOBBY TO LIVING 1', startYaw: 0.9 },
   foyertoliving2:        { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702032/foyertoliving2_qzatxq.jpg',          label: 'LOBBY TO LIVING 2' },
   livingtokitchen:       { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702042/livingtokitchen_vbhgqf.jpg',         label: 'LIVING TO KITCHEN' },
@@ -18,9 +18,9 @@ const rooms = {
   kidsbedroomcorridor:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1779279656/kids_bedroom_corridor_tprzwb.jpg',     label: 'KIDS BEDROOM CORRIDOR',startYaw: .6 },
   kidsbedroom:           { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1779279741/kids_bedroom_lnnx20.jpg',             label: 'KIDS BEDROOM' },
   kidsbedroomtoilet:     { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702069/kidsbedroomtoilet_vohcxo.jpg',       label: 'KIDS BEDROOM TOILET' },
-  guestbedroomcorridor: { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702049/guestbedroomcorridor1_ikczlt.jpg',  label: 'GUEST BEDROOM CORRIDOR' },
-  guestbedroom:         { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702038/guestbedroom1_l9wnvg.jpg',            label: 'GUEST BEDROOM' },
-  guestbedroomtoilet:   { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702060/guestbedroomtoilet1_avdzas.jpg',     label: 'GUEST BEDROOM TOILET', startYaw: -0.9  },
+  guestbedroomcorridor:  { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702049/guestbedroomcorridor1_ikczlt.jpg',  label: 'GUEST BEDROOM CORRIDOR' },
+  guestbedroom:          { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702038/guestbedroom1_l9wnvg.jpg',            label: 'GUEST BEDROOM' },
+  guestbedroomtoilet:    { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702060/guestbedroomtoilet1_avdzas.jpg',     label: 'GUEST BEDROOM TOILET', startYaw: -0.9  },
   bedroom3corridor:      { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702072/guestbedroomcorridor2_b12rmu.jpg',    label: 'BEDROOM 3 CORRIDOR' }, 
   bedroom3:              { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702051/guestbedroom2_cdufxz.jpg',             label: 'BEDROOM 3' },
   bedroom3toilet:        { image: 'https://res.cloudinary.com/dp5ifzgge/image/upload/v1777702053/guestbedroomtoilet2_b0ae1w.jpg',     label: 'BEDROOM 3 TOILET' },
