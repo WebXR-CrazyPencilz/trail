@@ -148,13 +148,13 @@ const hotspots = {
 
   // ── Kitchen ────────────────────────────────────────────────
   kitchen: [
-    { target: 'utility',         position: [-6.8,  -2.2, -2.0 ] },
+    { target: 'utility',         position: [-6.8,  -2.2, -1.50 ] },
     { target: 'livingtokitchen', position: [-0.4,  -2.2, -4.2 ] }
   ],
 
   // ── Utility ────────────────────────────────────────────────
   utility: [
-    { target: 'kitchen',         position: [7.5,  -2.2, -0.6 ] },
+    { target: 'kitchen',         position: [6.5,  -2.2, -0.6 ] },
     { target: 'staffroom',       position: [-3.0,  -2.2,  4.1 ] }
   ],
 
