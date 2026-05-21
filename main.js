@@ -42,9 +42,6 @@ const hotspots = {
     { target: 'foyertoliving2',   position: [-5.0,  -2.2, -3.0 ] }
   ],
 
-  // ── Living to Bedroom Junction ─────────────────────────────
-  // FIX BUG 1+2: added guestBedroomCorridor1 — was missing, making it unreachable
-  // from the bedroom side. Both guest corridors now accessible from here.
   livingtobedroom: [
     { target: 'living',                position: [-5.5,  -2.3,  0.10] },
     { target: 'masterbedroomcorridor',        position: [ 4.5,  -2.2,  0.0 ] },
@@ -105,17 +102,14 @@ const hotspots = {
     { target: 'guestbedroomcorridor', position: [ 2.0, -2.2, -1.50] }
   ],
 
-  // ── Guest Corridor 2 ───────────────────────────────────────
-  // FIX BUG 6: back nav position was [5.0,-2.2,0.0] (positive X = wrong direction)
-  // Changed to [-5.0,-2.2,0.0] so it faces the correct exit direction
   bedroom3corridor: [
     { target: 'livingtobedroom', position: [0.90,  -2.2,  -3.0 ] }, // FIX: was [5.0,...]
-    { target: 'guest3bedroom',   position: [ 5.0,  -2.2, 3.0 ] },
+    { target: 'bedroom3',   position: [ 5.0,  -2.2, 3.0 ] },
     { target: 'bedroom3toilet',    position: [ -1.2,  -2.2,  2.50 ] }
   ],
 
   // ── Guest Bedroom 2 ────────────────────────────────────────
-  guest3bedroom: [
+  bedroom3: [
     { target: 'bedroom3corridor', position: [-4.0, -2.2,  -3] }
   ],
 
