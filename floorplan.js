@@ -152,7 +152,7 @@
     svg.addEventListener('mouseover', e => {
       const z = e.target.closest('.fpz')
       if (!z) return
-      z.setAttribute('stroke', 'rgba(201,162,58,1)')
+      z.setAttribute('stroke', 'rgba(255,255,255,1)')
       z.setAttribute('stroke-width', '3')
       z.style.filter = 'drop-shadow(0 0 8px rgba(255,255,255,1)) drop-shadow(0 0 4px rgba(255,255,255,0.8))'
       showTip(z.dataset.label || z.dataset.room)
